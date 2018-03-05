@@ -1,5 +1,5 @@
 import Html exposing (Html, div, text, table, tr, td, input, button)
-import Html.Attributes exposing (type_, value, style)
+import Html.Attributes exposing (type_, value, style, min, max, step, disabled)
 import Html.Events exposing (onClick, onInput)
 import Array exposing (Array, get, set, repeat, fromList, toList, indexedMap, filter, map, slice)
 import List exposing (member)
@@ -221,9 +221,17 @@ view model =
             , input [ onInput ChangeMove
                     , value inputCurrentMove
                     , type_ "number"
+                    , Html.Attributes.min "0"
+                    , Html.Attributes.max "8"
+                    , step "1"
+                    , disabled model.isMoving
                     ] []
-            , button [ onClick MakeMove ] [ text "Move!" ]
-            , button [ onClick Reset ] [ text "Reset!" ]
+            , button [ onClick MakeMove
+                     , disabled model.isMoving
+                     ] [ text "Move!" ]
+            , button [ onClick Reset
+                     , disabled model.isMoving
+                     ] [ text "Reset!" ]
             ]
 
 buildRow : (Int, Model) -> Html msg

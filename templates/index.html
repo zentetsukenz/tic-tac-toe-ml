@@ -9519,7 +9519,23 @@ var _user$project$Main$view = function (model) {
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$type_('number'),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$min('0'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$max('8'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$step('1'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$disabled(model.isMoving),
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
 							}
 						}
 					},
@@ -9531,7 +9547,11 @@ var _user$project$Main$view = function (model) {
 						{
 							ctor: '::',
 							_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$MakeMove),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$disabled(model.isMoving),
+								_1: {ctor: '[]'}
+							}
 						},
 						{
 							ctor: '::',
@@ -9545,7 +9565,11 @@ var _user$project$Main$view = function (model) {
 							{
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Reset),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$disabled(model.isMoving),
+									_1: {ctor: '[]'}
+								}
 							},
 							{
 								ctor: '::',
