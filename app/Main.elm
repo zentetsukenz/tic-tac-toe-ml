@@ -1,6 +1,9 @@
-import Html exposing (Html, div, text, table, tr, td)
+import Html exposing (Html, div, text, table, tr, td, input, button)
+import Html.Attributes exposing (type_, value)
+import Html.Events exposing (onClick, onInput)
 import Array exposing (Array, get, set, repeat, fromList, toList, indexedMap, filter, map, slice)
 import List exposing (member)
+import String exposing (toInt)
 
 main =
     Html.beginnerProgram { model = initModel, view = view, update = update }
@@ -13,6 +16,7 @@ type alias Model =
     , playerTurn : Int
     , winner : Int
     , allowedMoves : AllowedMoves
+    , currentMove : Maybe Int
     }
 
 type alias GameState = Array Int
@@ -48,34 +52,55 @@ initModel =
         , playerTurn = 1
         , winner = 0
         , allowedMoves = allowedMoves
+        , currentMove = Nothing
         }
 
 -- Update
 
-type Msg = Move Int
+type Msg = MakeMove
+         | ChangeMove String
          | Reset
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Move move ->
-            if member move (toList model.allowedMoves) then
-                let
-                    newGameState = set move model.playerTurn model.gameState
-                    newPlayerTurn = model.playerTurn * -1
-                    newWinner = getWinner newGameState
-                    newAllowedMoves = getAllowedMoves newGameState
-                in
-                    { gameState = newGameState
-                    , playerTurn = newPlayerTurn
-                    , winner = newWinner
-                    , allowedMoves = newAllowedMoves
-                    }
-            else
-                model
+        MakeMove ->
+            case model.currentMove of
+                Just move ->
+                    updateModelWithMove move model
+
+                Nothing ->
+                    model
+
+        ChangeMove newMoveStr ->
+            case toInt newMoveStr of
+                Ok newMoveInt ->
+                    { model | currentMove = Just newMoveInt }
+
+                Err _ ->
+                    model
 
         Reset ->
             initModel
+
+updateModelWithMove : Int -> Model -> Model
+updateModelWithMove move model =
+    if member move (toList model.allowedMoves) then
+        let
+            newGameState = set move model.playerTurn model.gameState
+            newPlayerTurn = model.playerTurn * -1
+            newWinner = getWinner newGameState
+            newAllowedMoves = getAllowedMoves newGameState
+        in
+            { model | gameState = newGameState
+                    , playerTurn = newPlayerTurn
+                    , winner = newWinner
+                    , allowedMoves = newAllowedMoves
+                    , currentMove = Just move
+            }
+    else
+        model
+
 
 getWinner : GameState -> Int
 getWinner gameState =
@@ -130,7 +155,7 @@ getAt index array =
 
 -- View
 
-view : Model -> Html msg
+view : Model -> Html Msg
 view model =
     let
         rowModelList =
@@ -139,8 +164,19 @@ view model =
             , (2, model)
             ]
         rowModelArr = fromList rowModelList
+        inputCurrentMove = case model.currentMove of
+                               Just currentMove -> toString currentMove
+                               Nothing -> ""
     in
-        table [] (toList (map buildRow rowModelArr))
+        div []
+            [ table [] (toList (map buildRow rowModelArr))
+            , input [ onInput ChangeMove
+                    , value inputCurrentMove
+                    , type_ "number"
+                    ] []
+            , button [ onClick MakeMove ] [ text "Move!" ]
+            , button [ onClick Reset ] [ text "Reset!" ]
+            ]
 
 buildRow : (Int, Model) -> Html msg
 buildRow (row, model) =
