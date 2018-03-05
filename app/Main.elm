@@ -6,7 +6,11 @@ import List exposing (member)
 import String exposing (toInt)
 
 main =
-    Html.beginnerProgram { model = initModel, view = view, update = update }
+    Html.program { init = initModel
+                 , update = update
+                 , subscriptions = subscriptions
+                 , view = view
+                 }
 
 
 -- Model
@@ -42,18 +46,14 @@ extractIndex : (Int, Int) -> Int
 extractIndex (index, _) =
     index
 
-initModel : Model
+initModel : (Model, Cmd Msg)
 initModel =
     let
         gameState = initGameState
         allowedMoves = getAllowedMoves gameState
+        model = Model gameState 1 0 allowedMoves Nothing
     in
-        { gameState = gameState
-        , playerTurn = 1
-        , winner = 0
-        , allowedMoves = allowedMoves
-        , currentMove = Nothing
-        }
+        (model, Cmd.none)
 
 -- Update
 
@@ -61,24 +61,24 @@ type Msg = MakeMove
          | ChangeMove String
          | Reset
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
         MakeMove ->
             case model.currentMove of
                 Just move ->
-                    updateModelWithMove move model
+                    (updateModelWithMove move model, Cmd.none)
 
                 Nothing ->
-                    model
+                    (model, Cmd.none)
 
         ChangeMove newMoveStr ->
             case toInt newMoveStr of
                 Ok newMoveInt ->
-                    { model | currentMove = Just newMoveInt }
+                    ({ model | currentMove = Just newMoveInt }, Cmd.none)
 
                 Err _ ->
-                    model
+                    (model, Cmd.none)
 
         Reset ->
             initModel
@@ -152,6 +152,12 @@ getAt index array =
 
             Nothing ->
                 0
+
+-- Subscriptions
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
 
 -- View
 

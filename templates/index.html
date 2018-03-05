@@ -8266,12 +8266,15 @@ var _user$project$Main$buildRow = function (_p1) {
 		_elm_lang$core$Array$toList(
 			A2(_elm_lang$core$Array$map, _user$project$Main$buildCell, rowValue)));
 };
+var _user$project$Main$subscriptions = function (_p4) {
+	return _elm_lang$core$Platform_Sub$none;
+};
 var _user$project$Main$getAt = F2(
 	function (index, array) {
 		var result = A2(_elm_lang$core$Array$get, index, array);
-		var _p4 = result;
-		if (_p4.ctor === 'Just') {
-			return _p4._0;
+		var _p5 = result;
+		if (_p5.ctor === 'Just') {
+			return _p5._0;
 		} else {
 			return 0;
 		}
@@ -8280,11 +8283,11 @@ var _user$project$Main$gettingWinner = F2(
 	function (gameState, winConditions) {
 		gettingWinner:
 		while (true) {
-			var _p5 = winConditions;
-			if (_p5.ctor === '[]') {
+			var _p6 = winConditions;
+			if (_p6.ctor === '[]') {
 				return 0;
 			} else {
-				var winningArray = _elm_lang$core$Array$fromList(_p5._0);
+				var winningArray = _elm_lang$core$Array$fromList(_p6._0);
 				var a = A2(_user$project$Main$getAt, 0, winningArray);
 				var aValue = A2(_user$project$Main$getAt, a, gameState);
 				var b = A2(_user$project$Main$getAt, 1, winningArray);
@@ -8292,15 +8295,15 @@ var _user$project$Main$gettingWinner = F2(
 				var c = A2(_user$project$Main$getAt, 2, winningArray);
 				var cValue = A2(_user$project$Main$getAt, c, gameState);
 				var sumValue = (aValue + bValue) + cValue;
-				var _p6 = sumValue;
-				switch (_p6) {
+				var _p7 = sumValue;
+				switch (_p7) {
 					case 3:
 						return 1;
 					case -3:
 						return -1;
 					default:
 						var _v5 = gameState,
-							_v6 = _p5._1;
+							_v6 = _p6._1;
 						gameState = _v5;
 						winConditions = _v6;
 						continue gettingWinner;
@@ -8440,13 +8443,13 @@ var _user$project$Main$getWinner = function (gameState) {
 	};
 	return A2(_user$project$Main$gettingWinner, gameState, winConditions);
 };
-var _user$project$Main$extractIndex = function (_p7) {
-	var _p8 = _p7;
-	return _p8._0;
+var _user$project$Main$extractIndex = function (_p8) {
+	var _p9 = _p8;
+	return _p9._0;
 };
-var _user$project$Main$isNotMoved = function (_p9) {
-	var _p10 = _p9;
-	return _elm_lang$core$Native_Utils.eq(_p10._1, 0) ? true : false;
+var _user$project$Main$isNotMoved = function (_p10) {
+	var _p11 = _p10;
+	return _elm_lang$core$Native_Utils.eq(_p11._1, 0) ? true : false;
 };
 var _user$project$Main$getAllowedMoves = function (game_state) {
 	return A2(
@@ -8487,40 +8490,49 @@ var _user$project$Main$updateModelWithMove = F2(
 		}
 	});
 var _user$project$Main$initGameState = A2(_elm_lang$core$Array$repeat, 9, 0);
+var _user$project$Main$Model = F5(
+	function (a, b, c, d, e) {
+		return {gameState: a, playerTurn: b, winner: c, allowedMoves: d, currentMove: e};
+	});
 var _user$project$Main$initModel = function () {
 	var gameState = _user$project$Main$initGameState;
 	var allowedMoves = _user$project$Main$getAllowedMoves(gameState);
-	return {gameState: gameState, playerTurn: 1, winner: 0, allowedMoves: allowedMoves, currentMove: _elm_lang$core$Maybe$Nothing};
+	var model = A5(_user$project$Main$Model, gameState, 1, 0, allowedMoves, _elm_lang$core$Maybe$Nothing);
+	return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 }();
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p11 = msg;
-		switch (_p11.ctor) {
+		var _p12 = msg;
+		switch (_p12.ctor) {
 			case 'MakeMove':
-				var _p12 = model.currentMove;
-				if (_p12.ctor === 'Just') {
-					return A2(_user$project$Main$updateModelWithMove, _p12._0, model);
+				var _p13 = model.currentMove;
+				if (_p13.ctor === 'Just') {
+					return {
+						ctor: '_Tuple2',
+						_0: A2(_user$project$Main$updateModelWithMove, _p13._0, model),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				} else {
-					return model;
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
 			case 'ChangeMove':
-				var _p13 = _elm_lang$core$String$toInt(_p11._0);
-				if (_p13.ctor === 'Ok') {
-					return _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							currentMove: _elm_lang$core$Maybe$Just(_p13._0)
-						});
+				var _p14 = _elm_lang$core$String$toInt(_p12._0);
+				if (_p14.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								currentMove: _elm_lang$core$Maybe$Just(_p14._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				} else {
-					return model;
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
 			default:
 				return _user$project$Main$initModel;
 		}
-	});
-var _user$project$Main$Model = F5(
-	function (a, b, c, d, e) {
-		return {gameState: a, playerTurn: b, winner: c, allowedMoves: d, currentMove: e};
 	});
 var _user$project$Main$Reset = {ctor: 'Reset'};
 var _user$project$Main$ChangeMove = function (a) {
@@ -8529,9 +8541,9 @@ var _user$project$Main$ChangeMove = function (a) {
 var _user$project$Main$MakeMove = {ctor: 'MakeMove'};
 var _user$project$Main$view = function (model) {
 	var inputCurrentMove = function () {
-		var _p14 = model.currentMove;
-		if (_p14.ctor === 'Just') {
-			return _elm_lang$core$Basics$toString(_p14._0);
+		var _p15 = model.currentMove;
+		if (_p15.ctor === 'Just') {
+			return _elm_lang$core$Basics$toString(_p15._0);
 		} else {
 			return '';
 		}
@@ -8612,8 +8624,8 @@ var _user$project$Main$view = function (model) {
 			}
 		});
 };
-var _user$project$Main$main = _elm_lang$html$Html$beginnerProgram(
-	{model: _user$project$Main$initModel, view: _user$project$Main$view, update: _user$project$Main$update})();
+var _user$project$Main$main = _elm_lang$html$Html$program(
+	{init: _user$project$Main$initModel, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions, view: _user$project$Main$view})();
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
