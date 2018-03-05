@@ -1,5 +1,5 @@
 import Html exposing (Html, div, text, table, tr, td, input, button)
-import Html.Attributes exposing (type_, value)
+import Html.Attributes exposing (type_, value, style)
 import Html.Events exposing (onClick, onInput)
 import Array exposing (Array, get, set, repeat, fromList, toList, indexedMap, filter, map, slice)
 import List exposing (member)
@@ -245,4 +245,11 @@ buildCell player =
                      0 -> " "
                      _ -> "?"
     in
-        td [] [ text symbol ]
+        td [ style [ ("border", "1px solid black")
+                   , ("width", "50px")
+                   , ("height", "50px")
+                   , ("text-align", "center")
+                   , ("vertical-align", "middle")
+                   , ("font-size", "200%")
+                   ]
+           ] [ text symbol ]
