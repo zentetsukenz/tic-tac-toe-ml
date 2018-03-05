@@ -4,6 +4,10 @@ import Html.Events exposing (onClick, onInput)
 import Array exposing (Array, get, set, repeat, fromList, toList, indexedMap, filter, map, slice)
 import List exposing (member)
 import String exposing (toInt)
+import Json.Encode as Encoder
+import Json.Decode exposing (Decoder, int)
+import Json.Decode.Pipeline exposing (decode, required)
+import Http
 
 main =
     Html.program { init = initModel
@@ -21,10 +25,12 @@ type alias Model =
     , winner : Int
     , allowedMoves : AllowedMoves
     , currentMove : Maybe Int
+    , isMoving : Bool
     }
 
 type alias GameState = Array Int
 type alias AllowedMoves = Array Int
+type alias MoveResponse = { move : Int }
 
 initGameState : GameState
 initGameState =
@@ -51,13 +57,14 @@ initModel =
     let
         gameState = initGameState
         allowedMoves = getAllowedMoves gameState
-        model = Model gameState 1 0 allowedMoves Nothing
+        model = Model gameState 1 0 allowedMoves Nothing False
     in
         (model, Cmd.none)
 
 -- Update
 
 type Msg = MakeMove
+         | GetMove (Result Http.Error MoveResponse)
          | ChangeMove String
          | Reset
 
@@ -67,10 +74,23 @@ update msg model =
         MakeMove ->
             case model.currentMove of
                 Just move ->
-                    (updateModelWithMove move model, Cmd.none)
+                    let
+                        newModel = updateModelWithMove move model
+                    in
+                        ({ newModel | isMoving = True }, getOpponentMove newModel)
 
                 Nothing ->
                     (model, Cmd.none)
+
+        GetMove (Ok moveResponse) ->
+            let
+                newMove = moveResponse.move
+                newModel = updateModelWithMove newMove model
+            in
+                ({ newModel | isMoving = False }, Cmd.none)
+
+        GetMove (Err _) ->
+            ({ model | isMoving = False }, Cmd.none)
 
         ChangeMove newMoveStr ->
             case toInt newMoveStr of
@@ -82,6 +102,28 @@ update msg model =
 
         Reset ->
             initModel
+
+getOpponentMove : Model -> Cmd Msg
+getOpponentMove model =
+    let
+        url = "https://tic-tac-toe-ml.herokuapp.com/get_move"
+        params =
+            [ ("state", Encoder.array (map Encoder.int model.gameState))
+            , ("player_turn", Encoder.int model.playerTurn)
+            ]
+        body =
+            params
+            |> Encoder.object
+            |> Http.jsonBody
+        request =
+            Http.post url body decodeNewMove
+    in
+        Http.send GetMove request
+
+decodeNewMove : Decoder MoveResponse
+decodeNewMove =
+    decode MoveResponse
+        |> required "move" int
 
 updateModelWithMove : Int -> Model -> Model
 updateModelWithMove move model =
