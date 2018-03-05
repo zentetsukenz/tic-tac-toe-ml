@@ -7768,22 +7768,68 @@ var _elm_lang$html$Html$details = _elm_lang$html$Html$node('details');
 var _elm_lang$html$Html$summary = _elm_lang$html$Html$node('summary');
 var _elm_lang$html$Html$menuitem = _elm_lang$html$Html$node('menuitem');
 var _elm_lang$html$Html$menu = _elm_lang$html$Html$node('menu');
-var _user$project$Main$view = function (model) {
+var _user$project$Main$buildCell = function (player) {
+	var symbol = function () {
+		var _p0 = player;
+		switch (_p0) {
+			case 1:
+				return 'O';
+			case -1:
+				return 'X';
+			case 0:
+				return ' ';
+			default:
+				return '?';
+		}
+	}();
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$td,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text('loaaaaaal'),
+			_0: _elm_lang$html$Html$text(symbol),
 			_1: {ctor: '[]'}
 		});
+};
+var _user$project$Main$buildRow = function (_p1) {
+	var _p2 = _p1;
+	var _p3 = _p2._0;
+	var end = (_p3 * 3) + 3;
+	var start = _p3 * 3;
+	var rowValue = A3(_elm_lang$core$Array$slice, start, end, _p2._1.gameState);
+	return A2(
+		_elm_lang$html$Html$tr,
+		{ctor: '[]'},
+		_elm_lang$core$Array$toList(
+			A2(_elm_lang$core$Array$map, _user$project$Main$buildCell, rowValue)));
+};
+var _user$project$Main$view = function (model) {
+	var rowModelList = {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 0, _1: model},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 1, _1: model},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 2, _1: model},
+				_1: {ctor: '[]'}
+			}
+		}
+	};
+	var rowModelArr = _elm_lang$core$Array$fromList(rowModelList);
+	return A2(
+		_elm_lang$html$Html$table,
+		{ctor: '[]'},
+		_elm_lang$core$Array$toList(
+			A2(_elm_lang$core$Array$map, _user$project$Main$buildRow, rowModelArr)));
 };
 var _user$project$Main$getAt = F2(
 	function (index, array) {
 		var result = A2(_elm_lang$core$Array$get, index, array);
-		var _p0 = result;
-		if (_p0.ctor === 'Just') {
-			return _p0._0;
+		var _p4 = result;
+		if (_p4.ctor === 'Just') {
+			return _p4._0;
 		} else {
 			return 0;
 		}
@@ -7792,11 +7838,11 @@ var _user$project$Main$gettingWinner = F2(
 	function (gameState, winConditions) {
 		gettingWinner:
 		while (true) {
-			var _p1 = winConditions;
-			if (_p1.ctor === '[]') {
+			var _p5 = winConditions;
+			if (_p5.ctor === '[]') {
 				return 0;
 			} else {
-				var winningArray = _elm_lang$core$Array$fromList(_p1._0);
+				var winningArray = _elm_lang$core$Array$fromList(_p5._0);
 				var a = A2(_user$project$Main$getAt, 0, winningArray);
 				var aValue = A2(_user$project$Main$getAt, a, gameState);
 				var b = A2(_user$project$Main$getAt, 1, winningArray);
@@ -7804,17 +7850,17 @@ var _user$project$Main$gettingWinner = F2(
 				var c = A2(_user$project$Main$getAt, 2, winningArray);
 				var cValue = A2(_user$project$Main$getAt, c, gameState);
 				var sumValue = (aValue + bValue) + cValue;
-				var _p2 = sumValue;
-				switch (_p2) {
+				var _p6 = sumValue;
+				switch (_p6) {
 					case 3:
 						return 1;
 					case -3:
 						return -1;
 					default:
-						var _v3 = gameState,
-							_v4 = _p1._1;
-						gameState = _v3;
-						winConditions = _v4;
+						var _v5 = gameState,
+							_v6 = _p5._1;
+						gameState = _v5;
+						winConditions = _v6;
 						continue gettingWinner;
 				}
 			}
@@ -7952,13 +7998,13 @@ var _user$project$Main$getWinner = function (gameState) {
 	};
 	return A2(_user$project$Main$gettingWinner, gameState, winConditions);
 };
-var _user$project$Main$extractIndex = function (_p3) {
-	var _p4 = _p3;
-	return _p4._0;
+var _user$project$Main$extractIndex = function (_p7) {
+	var _p8 = _p7;
+	return _p8._0;
 };
-var _user$project$Main$isNotMoved = function (_p5) {
-	var _p6 = _p5;
-	return _elm_lang$core$Native_Utils.eq(_p6._1, 0) ? true : false;
+var _user$project$Main$isNotMoved = function (_p9) {
+	var _p10 = _p9;
+	return _elm_lang$core$Native_Utils.eq(_p10._1, 0) ? true : false;
 };
 var _user$project$Main$getAllowedMoves = function (game_state) {
 	return A2(
@@ -7983,15 +8029,15 @@ var _user$project$Main$initModel = function () {
 }();
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p7 = msg;
-		if (_p7.ctor === 'Move') {
-			var _p8 = _p7._0;
+		var _p11 = msg;
+		if (_p11.ctor === 'Move') {
+			var _p12 = _p11._0;
 			if (A2(
 				_elm_lang$core$List$member,
-				_p8,
+				_p12,
 				_elm_lang$core$Array$toList(model.allowedMoves))) {
 				var newPlayerTurn = model.playerTurn * -1;
-				var newGameState = A3(_elm_lang$core$Array$set, _p8, model.playerTurn, model.gameState);
+				var newGameState = A3(_elm_lang$core$Array$set, _p12, model.playerTurn, model.gameState);
 				var newWinner = _user$project$Main$getWinner(newGameState);
 				var newAllowedMoves = _user$project$Main$getAllowedMoves(newGameState);
 				return {gameState: newGameState, playerTurn: newPlayerTurn, winner: newWinner, allowedMoves: newAllowedMoves};

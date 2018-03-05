@@ -1,5 +1,5 @@
-import Html exposing (Html, div, text)
-import Array exposing (Array, get, set, repeat, fromList, toList, indexedMap, filter, map)
+import Html exposing (Html, div, text, table, tr, td)
+import Array exposing (Array, get, set, repeat, fromList, toList, indexedMap, filter, map, slice)
 import List exposing (member)
 
 main =
@@ -132,5 +132,33 @@ getAt index array =
 
 view : Model -> Html msg
 view model =
-    div []
-        [ text "loaaaaaal" ]
+    let
+        rowModelList =
+            [ (0, model)
+            , (1, model)
+            , (2, model)
+            ]
+        rowModelArr = fromList rowModelList
+    in
+        table [] (toList (map buildRow rowModelArr))
+
+buildRow : (Int, Model) -> Html msg
+buildRow (row, model) =
+    let
+        start = row * 3
+        end = (row * 3) + 3
+
+        rowValue = slice start end model.gameState
+    in
+        tr [] (toList (map buildCell rowValue))
+
+buildCell : Int -> Html msg
+buildCell player =
+    let
+        symbol = case player of
+                     1 -> "O"
+                     (-1) -> "X"
+                     0 -> " "
+                     _ -> "?"
+    in
+        td [] [ text symbol ]
